@@ -1,12 +1,10 @@
 package com.etnetera.hr.controller;
 
-import com.etnetera.hr.data.dto.ErrorMessageDto;
 import com.etnetera.hr.data.dto.FrameworkDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.etnetera.hr.service.FrameworkService;
-import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -48,26 +46,12 @@ public class JavaScriptFrameworkController {
 
     @PostMapping()
     public ResponseEntity createFramework(@Valid @RequestBody final FrameworkDto payload, final BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getAllErrors()
-                    .stream()
-                    .map(error -> new ErrorMessageDto(error.getDefaultMessage()))
-                    .collect(Collectors.toList()));
-        }
-
         service.createFramework(payload);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping("{id}")
     public ResponseEntity updateFramework(@Valid @RequestBody final FrameworkDto payload, @PathVariable(required = true) Long id, final BindingResult result) {
-        if (result.hasErrors()) {
-            return ResponseEntity.badRequest().body(result.getAllErrors()
-                    .stream()
-                    .map(error -> new ErrorMessageDto(error.getDefaultMessage()))
-                    .collect(Collectors.toList()));
-        }
-
         service.updateFramework(payload, id);
         return ResponseEntity.ok().build();
     }

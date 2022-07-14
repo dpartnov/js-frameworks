@@ -1,6 +1,9 @@
 package com.etnetera.hr.exception;
 
 import com.etnetera.hr.data.dto.ErrorMessageDto;
+import java.util.stream.Collectors;
+import javax.validation.ConstraintViolationException;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -21,10 +24,19 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
                 .body(new ErrorMessageDto(ex.getMessage()));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    public final ResponseEntity handleConstraintViolationException(Exception ex, WebRequest request) {
+        ConstraintViolationException constEx = (ConstraintViolationException) ex;
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(constEx.getConstraintViolations()
+                        .stream().map(e -> new ErrorMessageDto(e.getMessage())).collect(Collectors.toList()));
+    }
+
     @ExceptionHandler(Exception.class)
     public final ResponseEntity handleAllExceptions(Exception ex, WebRequest request) {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ex.getMessage());
+                .body(ex.getStackTrace());
     }
 }
