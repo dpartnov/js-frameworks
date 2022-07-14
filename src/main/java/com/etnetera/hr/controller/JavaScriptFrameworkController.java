@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Simple REST controller for accessing application logic.
@@ -33,6 +34,11 @@ public class JavaScriptFrameworkController {
     @GetMapping()
     public ResponseEntity frameworks() {
         return ResponseEntity.ok(service.getAll());
+    }
+
+    @GetMapping("/find")
+    public ResponseEntity frameworksByFilter(@RequestParam(required = true, name = "name") String name) {
+        return ResponseEntity.ok(service.getAllByFilter(name));
     }
 
     @GetMapping("{id}")
@@ -65,7 +71,7 @@ public class JavaScriptFrameworkController {
         service.updateFramework(payload, id);
         return ResponseEntity.ok().build();
     }
-    
+
     @DeleteMapping("{id}")
     public ResponseEntity deleteFramework(@PathVariable(required = true) Long id) {
         service.delete(id);

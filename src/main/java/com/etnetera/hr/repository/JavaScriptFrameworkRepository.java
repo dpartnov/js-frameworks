@@ -16,5 +16,7 @@ public interface JavaScriptFrameworkRepository extends JpaRepository<JavaScriptF
 
     public Optional<JavaScriptFramework> findByName(String name);
     
+    public List<JavaScriptFramework> findByNameContainingIgnoreCase(String filter);
+    
     public List<JavaScriptFramework> findByNameAndIdNotIn(String name, List<Long> ids);
 }

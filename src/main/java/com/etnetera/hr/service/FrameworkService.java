@@ -16,32 +16,38 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class FrameworkService {
-
+    
     @Autowired
     private JavaScriptFrameworkRepository repository;
     @Autowired
     private JavaScriptFrameworkVersionRepository versionRepository;
-
+    
     public List<FrameworkDto> getAll() {
         return repository.findAll().stream().map(entity -> {
             return entityToDto(entity);
         }).collect(Collectors.toList());
     }
-
+    
+    public List<FrameworkDto> getAllByFilter(String name) {
+        return repository.findByNameContainingIgnoreCase(name).stream().map(entity -> {
+            return entityToDto(entity);
+        }).collect(Collectors.toList());
+    }
+    
     public FrameworkDto getDetail(Long id) {
         return entityToDto(getFrameworkById(id));
     }
-
+    
     public void createFramework(final FrameworkDto payload) {
         if (repository.findByName(payload.getName().trim()).isPresent()) {
             throw new ValidationException(String.format("Framework %s already exists!", payload.getName()));
         }
-
+        
         JavaScriptFramework entity = new JavaScriptFramework();
         entity.setName(payload.getName().trim());
         entity.setHypeLevel(payload.getHypeLevel());
         entity = repository.save(entity);
-
+        
         for (FrameworkVersionDto versionDto : payload.getVersions()) {
             JavaScriptFrameworkVersion versionEntity = new JavaScriptFrameworkVersion();
             versionEntity.setVersion(versionDto.getVersion().trim());
@@ -50,14 +56,14 @@ public class FrameworkService {
             versionRepository.save(versionEntity);
         }
     }
-
+    
     public void updateFramework(final FrameworkDto payload, final Long id) {
         JavaScriptFramework entity = getFrameworkById(id);
-
+        
         if (!repository.findByNameAndIdNotIn(payload.getName(), Arrays.asList(payload.getId())).isEmpty()) {
             throw new ValidationException(String.format("Other framework with name %s already exists!", payload.getName()));
         }
-
+        
         entity.setName(payload.getName());
         entity.setHypeLevel(payload.getHypeLevel());
 
@@ -81,7 +87,7 @@ public class FrameworkService {
                 versionToCreate.setFramework(entity);
                 versionRepository.save(versionToCreate);
             }
-
+            
         });
 
         //Iterate over all versions from DB
@@ -92,22 +98,22 @@ public class FrameworkService {
                 versionRepository.delete(version);
             }
         });
-
+        
         repository.save(entity);
     }
-
+    
     public void delete(Long id) {
         JavaScriptFramework entity = getFrameworkById(id);
         versionRepository.deleteAll(versionRepository.findByFramework(entity));
         repository.delete(entity);
     }
-
+    
     private FrameworkDto entityToDto(JavaScriptFramework entity) {
         FrameworkDto dto = new FrameworkDto();
         dto.setId(entity.getId());
         dto.setHypeLevel(entity.getHypeLevel());
         dto.setName(entity.getName());
-
+        
         dto.setVersions(entity.getVersions().stream().map(versionEntity -> {
             FrameworkVersionDto versionDto = new FrameworkVersionDto();
             versionDto.setDeprecationDate(versionEntity.getDeprecationDate());
@@ -116,7 +122,7 @@ public class FrameworkService {
         }).collect(Collectors.toList()));
         return dto;
     }
-
+    
     private JavaScriptFramework getFrameworkById(Long id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ValidationException(String.format("Framework with ID %d does not exists!", id)));
