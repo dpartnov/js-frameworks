@@ -29,21 +29,18 @@ import lombok.NoArgsConstructor;
 public class JavaScriptFramework implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "NAME", nullable = false, length = 30)
     private String name;
-
-    @Column(name = "DEPRECATION_DATE", nullable = false)
-    private LocalDate deprecationDate;
 
     @Min(1)
     @Max(10)
     @Column(name = "HYPE_LEVEL", nullable = false)
     private Integer hypeLevel;
     
-    @OneToMany(mappedBy="frameworkId")
+    @OneToMany(mappedBy="framework")
     private List<JavaScriptFrameworkVersion> versions;
     
     @Override
