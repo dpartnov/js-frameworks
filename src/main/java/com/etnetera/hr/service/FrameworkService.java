@@ -8,6 +8,7 @@ import com.etnetera.hr.exception.ValidationException;
 import com.etnetera.hr.repository.JavaScriptFrameworkRepository;
 import com.etnetera.hr.repository.JavaScriptFrameworkVersionRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,26 +23,21 @@ public class FrameworkService {
 
     public List<FrameworkDto> getAll() {
         return repository.findAll().stream().map(entity -> {
-            FrameworkDto dto = new FrameworkDto();
-            dto.setId(entity.getId());
-            dto.setHypeLevel(entity.getHypeLevel());
-            dto.setName(entity.getName());
-
-            dto.setVersions(entity.getVersions().stream().map(versionEntity -> {
-                FrameworkVersionDto versionDto = new FrameworkVersionDto();
-                versionDto.setDeprecationDate(versionEntity.getDeprecationDate());
-                versionDto.setVersion(versionEntity.getVersion());
-                return versionDto;
-            }).collect(Collectors.toList()));
-            return dto;
+            return entityToDto(entity);
         }).collect(Collectors.toList());
+    }
+
+    public FrameworkDto getDetail(Long id) {
+        JavaScriptFramework entity = repository.findById(id)
+                .orElseThrow(() -> new ValidationException(String.format("Framework with ID %d does not exists!", id)));
+        return entityToDto(entity);
     }
 
     public void createFramework(final FrameworkDto payload) {
         if (repository.findByName(payload.getName().trim()).isPresent()) {
             throw new ValidationException(String.format("Framework %s already exists!", payload.getName()));
         }
-        
+
         JavaScriptFramework entity = new JavaScriptFramework();
         entity.setName(payload.getName());
         entity.setHypeLevel(payload.getHypeLevel());
@@ -54,5 +50,20 @@ public class FrameworkService {
             versionEntity.setFramework(entity);
             versionRepository.save(versionEntity);
         }
+    }
+
+    private FrameworkDto entityToDto(JavaScriptFramework entity) {
+        FrameworkDto dto = new FrameworkDto();
+        dto.setId(entity.getId());
+        dto.setHypeLevel(entity.getHypeLevel());
+        dto.setName(entity.getName());
+
+        dto.setVersions(entity.getVersions().stream().map(versionEntity -> {
+            FrameworkVersionDto versionDto = new FrameworkVersionDto();
+            versionDto.setDeprecationDate(versionEntity.getDeprecationDate());
+            versionDto.setVersion(versionEntity.getVersion());
+            return versionDto;
+        }).collect(Collectors.toList()));
+        return dto;
     }
 }

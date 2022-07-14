@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +32,12 @@ public class JavaScriptFrameworkController {
     public ResponseEntity frameworks() {
         return ResponseEntity.ok(service.getAll());
     }
-    
+
+    @GetMapping("{id}")
+    public ResponseEntity frameworkDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getDetail(id));
+    }
+
     @PostMapping()
     public ResponseEntity createFramework(@Valid @RequestBody final FrameworkDto payload, final BindingResult result) {
         if (result.hasErrors()) {
