@@ -1,7 +1,3 @@
-/*
- * Photospot.cz - All rights reserved.
- * 
- */
 package com.etnetera.hr.exception;
 
 import com.etnetera.hr.data.dto.ErrorMessageDto;
