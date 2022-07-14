@@ -9,7 +9,6 @@ import com.etnetera.hr.repository.JavaScriptFrameworkRepository;
 import com.etnetera.hr.repository.JavaScriptFrameworkVersionRepository;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,7 @@ public class FrameworkService {
     }
 
     public FrameworkDto getDetail(Long id) {
-        JavaScriptFramework entity = repository.findById(id)
-                .orElseThrow(() -> new ValidationException(String.format("Framework with ID %d does not exists!", id)));
-        return entityToDto(entity);
+        return entityToDto(getFrameworkById(id));
     }
 
     public void createFramework(final FrameworkDto payload) {
@@ -55,8 +52,7 @@ public class FrameworkService {
     }
 
     public void updateFramework(final FrameworkDto payload, final Long id) {
-        JavaScriptFramework entity = repository.findById(id)
-                .orElseThrow(() -> new ValidationException(String.format("Framework with ID %d does not exists!", id)));
+        JavaScriptFramework entity = getFrameworkById(id);
 
         if (!repository.findByNameAndIdNotIn(payload.getName(), Arrays.asList(payload.getId())).isEmpty()) {
             throw new ValidationException(String.format("Other framework with name %s already exists!", payload.getName()));
@@ -96,8 +92,14 @@ public class FrameworkService {
                 versionRepository.delete(version);
             }
         });
-        
+
         repository.save(entity);
+    }
+
+    public void delete(Long id) {
+        JavaScriptFramework entity = getFrameworkById(id);
+        versionRepository.deleteAll(versionRepository.findByFramework(entity));
+        repository.delete(entity);
     }
 
     private FrameworkDto entityToDto(JavaScriptFramework entity) {
@@ -113,5 +115,10 @@ public class FrameworkService {
             return versionDto;
         }).collect(Collectors.toList()));
         return dto;
+    }
+
+    private JavaScriptFramework getFrameworkById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new ValidationException(String.format("Framework with ID %d does not exists!", id)));
     }
 }

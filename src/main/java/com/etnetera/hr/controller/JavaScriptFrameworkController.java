@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -53,7 +54,7 @@ public class JavaScriptFrameworkController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity frameworkUpdate(@Valid @RequestBody final FrameworkDto payload, @PathVariable(required = true) Long id, final BindingResult result) {
+    public ResponseEntity updateFramework(@Valid @RequestBody final FrameworkDto payload, @PathVariable(required = true) Long id, final BindingResult result) {
         if (result.hasErrors()) {
             return ResponseEntity.badRequest().body(result.getAllErrors()
                     .stream()
@@ -62,6 +63,12 @@ public class JavaScriptFrameworkController {
         }
 
         service.updateFramework(payload, id);
+        return ResponseEntity.ok().build();
+    }
+    
+    @DeleteMapping("{id}")
+    public ResponseEntity deleteFramework(@PathVariable(required = true) Long id) {
+        service.delete(id);
         return ResponseEntity.ok().build();
     }
 
