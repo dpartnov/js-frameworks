@@ -1,5 +1,8 @@
 package com.etnetera.hr.exception;
 
+/**
+ * Custom exception for user data validation.
+ */
 public class ValidationException extends RuntimeException {
 
     public ValidationException() {

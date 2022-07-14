@@ -22,22 +22,41 @@ public class FrameworkService {
     @Autowired
     private JavaScriptFrameworkVersionRepository versionRepository;
     
+    /**
+     * Get all frameworks from DB.
+     * @return array of {@link FrameworkDto} objects.
+     */
     public List<FrameworkDto> getAll() {
         return repository.findAll().stream().map(entity -> {
             return entityToDto(entity);
         }).collect(Collectors.toList());
     }
     
+    /**
+     * Get all frameworks from DB by name filter.
+     * @param name filter value
+     * @return array of {@link FrameworkDto} objects.
+     */
     public List<FrameworkDto> getAllByFilter(String name) {
         return repository.findByNameContainingIgnoreCase(name).stream().map(entity -> {
             return entityToDto(entity);
         }).collect(Collectors.toList());
     }
     
+    /**
+     * Get detail about framework entity from DB.
+     * @param id framwork ID
+     * @return {@link FrameworkDto} 
+     */
     public FrameworkDto getDetail(Long id) {
         return entityToDto(getFrameworkById(id));
     }
     
+    /**
+     * Create new framework entity.
+     * @throws ValidationException if other framework with same name exists in DB.
+     * @param payload Data about new framework
+     */
     public void createFramework(final FrameworkDto payload) {
         if (repository.findByName(payload.getName().trim()).isPresent()) {
             throw new ValidationException(String.format("Framework %s already exists!", payload.getName()));
@@ -57,6 +76,12 @@ public class FrameworkService {
         }
     }
     
+    /**
+     * Update information about framework.
+     * @throws ValidationException if other framework with same name exists in DB.
+     * @param payload New framework information.
+     * @param id Framework ID
+     */
     public void updateFramework(final FrameworkDto payload, final Long id) {
         JavaScriptFramework entity = getFrameworkById(id);
         
@@ -102,6 +127,10 @@ public class FrameworkService {
         repository.save(entity);
     }
     
+    /**
+     * Delete framework data from DB.
+     * @param id Framework ID
+     */
     public void delete(Long id) {
         JavaScriptFramework entity = getFrameworkById(id);
         versionRepository.deleteAll(versionRepository.findByFramework(entity));

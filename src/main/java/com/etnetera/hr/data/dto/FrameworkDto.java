@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * DTO Object for transferring data between BE and FE.
+ * Contatains framework information.
  */
 @Data
 @AllArgsConstructor

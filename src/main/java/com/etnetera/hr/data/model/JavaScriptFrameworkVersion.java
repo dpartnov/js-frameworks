@@ -15,7 +15,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Data entity for FRAMEWORK_VERSIONS table
+ * Data entity for FRAMEWORK_VERSIONS table.
  */
 @Entity(name = "FRAMEWORK_VERSIONS")
 @Data

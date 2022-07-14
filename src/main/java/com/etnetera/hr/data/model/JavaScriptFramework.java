@@ -41,8 +41,4 @@ public class JavaScriptFramework implements Serializable {
     @OneToMany(mappedBy="framework")
     private List<JavaScriptFrameworkVersion> versions;
     
-    @Override
-    public String toString() {
-        return id.toString();
-    }
 }
